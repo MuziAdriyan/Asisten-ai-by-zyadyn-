@@ -20,3 +20,40 @@ data class ChatMessageEntity(
     val content: String,
     val timestamp: Long
 )
+
+// app/src/main/java/com/muzidev/zyyai/data/local/ChatDao.kt
+package com.muzidev.zyyai.data.local
+
+import androidx.room.*
+import kotlinx.coroutines.flow.Flow
+
+@Dao
+interface ChatDao {
+    @Query("SELECT * FROM sessions ORDER BY updatedAt DESC")
+    fun getAllSessions(): Flow<List<ChatSessionEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertSession(session: ChatSessionEntity)
+
+    @Query("UPDATE sessions SET title = :title, updatedAt = :updatedAt WHERE id = :id")
+    suspend fun updateSessionTitle(id: String, title: String, updatedAt: Long)
+
+    @Query("DELETE FROM sessions WHERE id = :id")
+    suspend fun deleteSession(id: String)
+
+    @Query("DELETE FROM sessions")
+    suspend fun clearAllSessions()
+
+    @Query("SELECT * FROM messages WHERE sessionId = :sessionId ORDER BY timestamp ASC")
+    fun getMessagesForSession(sessionId: String): Flow<List<ChatMessageEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertMessage(message: ChatMessageEntity)
+
+    @Query("DELETE FROM messages WHERE sessionId = :sessionId")
+    suspend fun deleteMessagesForSession(sessionId: String)
+    
+    @Query("DELETE FROM messages WHERE id = :id")
+    suspend fun deleteMessageById(id: Long)
+}
+
