@@ -1,0 +1,129 @@
+// app/src/main/java/com/muzidev/zyyai/ui/theme/Color.kt
+package com.muzidev.zyyai.ui.theme
+
+import androidx.compose.ui.graphics.Color
+
+val BackgroundDark = Color(0xFF090D16)
+val SurfaceDark = Color(0xFF121824)
+val SurfaceCard = Color(0xFF1A2332)
+val CyanAccent = Color(0xFF00E5FF)
+val BlueAccent = Color(0xFF2979FF)
+val TextPrimary = Color(0xFFF0F4F8)
+val TextSecondary = Color(0xFF8A99AD)
+val ErrorRed = Color(0xFFFF5252)
+
+// app/src/main/java/com/muzidev/zyyai/ui/components/VectorIcons.kt
+package com.muzidev.zyyai.ui.components
+
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathFillType
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.path
+import androidx.compose.ui.unit.dp
+
+object CustomIcons {
+    val Send: ImageVector
+        get() = ImageVector.Builder(
+            name = "Send",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
+        ).apply {
+            path(fill = SolidColor(Color.White)) {
+                moveTo(2.01f, 21f)
+                lineTo(23f, 12f)
+                lineTo(2.01f, 3f)
+                lineTo(2f, 10f)
+                lineToRelative(15f, 2f)
+                lineToRelative(-15f, 2f)
+                close()
+            }
+        }.build()
+
+    val Mic: ImageVector
+        get() = ImageVector.Builder(
+            name = "Mic",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
+        ).apply {
+            path(fill = SolidColor(Color.White)) {
+                moveTo(12f, 14f)
+                curveToRelative(1.66f, 0f, 3f, -1.34f, 3f, -3f)
+                verticalTo(5f)
+                curveToRelative(0f, -1.66f, -1.34f, -3f, -3f, -3f)
+                reflectiveCurveTo(9f, 3.34f, 9f, 5f)
+                verticalToRelative(6f)
+                curveToRelative(0f, 1.66f, 1.34f, 3f, 3f, 3f)
+                close()
+                moveTo(17f, 11f)
+                curveToRelative(0f, 2.76f, -2.24f, 5f, -5f, 5f)
+                reflectiveCurveToRelative(-5f, -2.24f, -5f, -5f)
+                H5f)
+                curveToRelative(0f, 3.53f, 2.61f, 6.43f, 6f, 6.92f)
+                V21f)
+                horizontalLineToRelative(2f)
+                verticalLineToRelative(-3.08f)
+                curveToRelative(3.39f, -0.49f, 6Configs, -3.39f, 6f, -6.92f)
+                horizontalLineToRelative(-2f)
+                close()
+            }
+        }.build()
+
+    val Stop: ImageVector
+        get() = ImageVector.Builder(
+            name = "Stop",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
+        ).apply {
+            path(fill = SolidColor(Color.White)) {
+                moveTo(6f, 6f)
+                horizontalLineToRelative(12f)
+                verticalLineToRelative(12f)
+                H6f)
+                close()
+            }
+        }.build()
+
+    val Copy: ImageVector
+        get() = ImageVector.Builder(
+            name = "Copy",
+            defaultWidth = 24.dp,
+            defaultHeight = 24.dp,
+            viewportWidth = 24f,
+            viewportHeight = 24f
+        ).apply {
+            path(fill = SolidColor(Color.White)) {
+                moveTo(16f, 1f)
+                H4f)
+                curveToRelative(-1.1f, 0f, -2f, 0.9f, -2f, 2f)
+                verticalLineToRelative(14f)
+                horizontalLineToRelative(2f)
+                V3f)
+                horizontalLineToRelative(12f)
+                V1f)
+                close()
+                moveTo(19f, 5f)
+                H8f)
+                curveToRelative(-1.1f, 0f, -2f, 0.9f, -2f, 2f)
+                verticalLineToRelative(14f)
+                curveToRelative(0f, 1.1f, 0.9f, 2f, 2f, 2f)
+                horizontalLineToRelative(11f)
+                curveToRelative(1.1f, 0f, 2f, -0.9f, 2f, -2f)
+                V7f)
+                curveToRelative(0f, -1.1f, -0.9f, -2f, -2f, -2f)
+                close()
+                moveTo(19f, 21f)
+                H8f)
+                V7f)
+                horizontalLineToRelative(11f)
+                verticalLineToRelative(14f)
+                close()
+            }
+        }.build()
+}
