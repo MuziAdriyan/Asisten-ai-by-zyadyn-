@@ -1,0 +1,22 @@
+// app/src/main/java/com/muzidev/zyyai/data/local/ChatEntities.kt
+package com.muzidev.zyyai.data.local
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "sessions")
+data class ChatSessionEntity(
+    @PrimaryKey val id: String,
+    val title: String,
+    val createdAt: Long,
+    val updatedAt: Long
+)
+
+@Entity(tableName = "messages")
+data class ChatMessageEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val sessionId: String,
+    val sender: String, // "USER" or "ASSISTANT"
+    val content: String,
+    val timestamp: Long
+)
