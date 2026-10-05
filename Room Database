@@ -57,3 +57,13 @@ interface ChatDao {
     suspend fun deleteMessageById(id: Long)
 }
 
+// app/src/main/java/com/muzidev/zyyai/data/local/AppDatabase.kt
+package com.muzidev.zyyai.data.local
+
+import androidx.room.Database
+import androidx.room.RoomDatabase
+
+@Database(entities = [ChatSessionEntity::class, ChatMessageEntity::class], version = 1, exportSchema = false)
+abstract class AppDatabase : RoomDatabase() {
+    abstract fun chatDao(): ChatDao
+}
