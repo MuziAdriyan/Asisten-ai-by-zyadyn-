@@ -1,0 +1,103 @@
+// app/src/main/java/com/muzidev/zyyai/data/remote/Models.kt
+package com.muzidev.zyyai.data.remote
+
+data class ApiMessage(val role: String, val content: String)
+
+data class ApiRequest(
+    val model: String,
+    val messages: List<ApiMessage>,
+    val temperature: Double,
+    val stream: Boolean
+)
+
+data class StreamDelta(val content: String?)
+data class StreamChoice(val delta: StreamDelta)
+data class StreamChunk(val choices: List<StreamChoice>?)
+
+// app/src/main/java/com/muzidev/zyyai/data/repository/ChatRepository.kt
+package com.muzidev.zyyai.data.repository
+
+import com.google.gson.Gson
+import com.muzidev.zyyai.data.local.*
+import com.muzidev.zyyai.data.remote.*
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.sse.EventSource
+import okhttp3.sse.EventSourceListener
+import okhttp3.sse.EventSources
+import java.util.concurrent.TimeUnit
+
+class ChatRepository(private val dao: ChatDao) {
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
+        .build()
+
+    private val gson = Gson()
+
+    fun getSessions(): Flow<List<ChatSessionEntity>> = dao.getAllSessions()
+    fun getMessages(sessionId: String): Flow<List<ChatMessageEntity>> = dao.getMessagesForSession(sessionId)
+
+    suspend fun createSession(id: String, title: String) {
+        val now = System.currentTimeMillis()
+        dao.insertSession(ChatSessionEntity(id, title, now, now))
+    }
+
+    suspend fun saveMessage(sessionId: String, sender: String, content: String): Long {
+        val msg = ChatMessageEntity(sessionId = sessionId, sender = sender, content = content, timestamp = System.currentTimeMillis())
+        dao.insertMessage(msg)
+        dao.updateSessionTitle(sessionId, getTruncatedTitle(content), System.currentTimeMillis())
+        return msg.id
+    }
+
+    suspend fun deleteSession(sessionId: String) {
+        dao.deleteMessagesForSession(sessionId)
+        dao.deleteSession(sessionId)
+    }
+
+    suspend fun clearHistory() {
+        dao.clearAllSessions()
+    }
+
+    fun streamAiResponse(baseUrl: String, model: String, temperature: Double, contextMessages: List<ApiMessage>): Flow<String> = callbackFlow {
+        val requestBody = gson.toJson(
+            ApiRequest(model = model, messages = contextMessages, temperature = temperature, stream = true)
+        )
+
+        val request = Request.Builder()
+            .url(baseUrl)
+            .post(RequestBody.create("application/json".toMediaType(), requestBody))
+            .build()
+
+        val factory = EventSources.createFactory(client)
+        val eventSource = factory.newEventSource(request, object : EventSourceListener() {
+            override fun onEvent(eventSource: EventSource, id: String?, type: String?, data: String) {
+                if (data == "[DONE]") {
+                    close()
+                    return
+                }
+                try {
+                    val chunk = gson.fromJson(data, StreamChunk::class.java)
+                    val text = chunk?.choices?.firstOrNull()?.delta?.content
+                    if (!text.isNullOrEmpty()) {
+                        trySend(text)
+                    }
+                } catch (_: Exception) {}
+            }
+
+            override fun onFailure(eventSource: EventSource, t: Throwable?, response: Response?) {
+                close(Exception("Koneksi ke server gagal. Periksa koneksi internet lalu coba lagi."))
+            }
+        })
+
+        awaitClose { eventSource.cancel() }
+    }
+
+    private fun getTruncatedTitle(text: String): String {
+        return if (text.length > 25) text.take(25) + "..." else text
+    }
+}
+
